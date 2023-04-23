@@ -31,6 +31,7 @@ iTerm2 > Install Shell Integration
 # Install LaTeX
 ```
 > brew install mactex-no-gui tex-live-utility
+> ln -s /usr/local/texlive/texmf-local/tex/latex latex
 ```
 
 # Install Transmission
@@ -59,3 +60,20 @@ brew install bettertouchtool
 ```
 
 # Install [Bitwarden](https://apps.apple.com/za/app/bitwarden/id1352778147)
+
+# Install Karabiner Elements
+```
+> brew install karabiner-elements
+```
+
+# iCloud Documents, Downloads, and Desktop
+```
+> ln -s ~/Library/Mobile\ Documents/com~apple~CloudDocs/Downloads Downloads
+```
+
+# Miscellaneous Settings
+## Disable charging chime
+```
+> defaults write com.apple.PowerChime ChimeOnAllHardware -bool false; killall PowerChime
+```
+

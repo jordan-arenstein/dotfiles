@@ -173,6 +173,7 @@ vim.opt.undofile = true
 vim.undodir = vim.fn.stdpath "data" .. "/undo"
 vim.opt.splitbelow = true
 vim.opt.splitright = true
+vim.opt.splitkeep = "screen"
 vim.opt.cmdheight = 1
 
 -- # editing
