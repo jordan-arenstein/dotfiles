@@ -96,6 +96,27 @@ require "packer".startup(function (use)
 				enable_autosnippets = true,
 				ext_opts = {},
 			}
+
+			require("luasnip.loaders.from_lua").load("luasnippets")
+			vim.keymap.set({ "i", "s" }, "<tab>", function ()
+				local luasnip = require "luasnip"
+				if luasnip.expand_or_jumpable() then
+					luasnip.expand_or_jump()
+				end
+			end)
+			vim.keymap.set({ "i", "s" }, "<s-tab>", function ()
+				local luasnip = require "luasnip"
+				if luasnip.jumpable(-1) then
+					luasnip.jump(-1)
+				end
+			end)
+			vim.keymap.set({ "i", "s" }, "<c-space>", function ()
+				local luasnip = require "luasnip"
+				if luasnip.choice_active() then
+					luasnip.change_choice(1)
+				end
+			end)
+			vim.keymap.set("s", "<bs>", "<bs>a") -- deleting in select mode should enter insert mode at the next snippet point
 		end
 	}
 
@@ -125,11 +146,8 @@ require "packer".startup(function (use)
 			require "lualine".setup{}
 		end,
 	}
-	-- use {
-	-- 	"vim-airline/vim-airline",
-	-- 	requires = { "vim-airline/vim-airline-themes" },
-	-- }
-	use { "lervag/vimtex",
+	use {
+		"lervag/vimtex",
 		requires = { "wellle/targets.vim" }
 	}
 
@@ -173,28 +191,6 @@ vim.opt.conceallevel = 0
 vim.opt.foldmethod = "expr"
 vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
 
--- luasnips
-require("luasnip.loaders.from_lua").load("luasnippets")
-vim.keymap.set({ "i", "s" }, "<tab>", function ()
-	local luasnip = require "luasnip"
-	if luasnip.expand_or_jumpable() then
-		luasnip.expand_or_jump()
-	end
-end)
-vim.keymap.set({ "i", "s" }, "<s-tab>", function ()
-	local luasnip = require "luasnip"
-	if luasnip.jumpable(-1) then
-		luasnip.jump(-1)
-	end
-end)
-vim.keymap.set({ "i", "s" }, "<c-space>", function ()
-	local luasnip = require "luasnip"
-	if luasnip.choice_active() then
-		luasnip.change_choice(1)
-	end
-end)
-vim.keymap.set("s", "<bs>", "<bs>a") -- deleting in select mode should enter insert mode at the next snippet point
-
 -- # navigation
 vim.keymap.set("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 vim.keymap.set("n", "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
@@ -203,7 +199,6 @@ vim.opt.ignorecase = true
 vim.opt.smartcase = true
 vim.opt.inccommand = "split"
 vim.keymap.set("n", "<leader><leader>", vim.cmd.nohlsearch)
-
 -- telescope
 vim.keymap.set("n", "<leader>ff", function () require "telescope.builtin".find_files() end)
 vim.keymap.set("n", "<leader>fr", function () require "telescope.builtin".registers() end)
@@ -216,7 +211,6 @@ vim.opt.termguicolors = true
 vim.cmd.colorscheme "tokyonight"
 vim.opt.background = "dark"
 vim.opt.showtabline = 1
--- vim.g["airline#extensions#tabline#enabled"] = false
 
 -- # latex
 vim.g.tex_flavor = "latex"
@@ -244,31 +238,3 @@ vim.api.nvim_create_autocmd("User", {
 	callback = vim.cmd.VimtexClean,
 	desc = "clean auxiliary files on quit"
 })
-vim.api.nvim_create_autocmd("Filetype", {
-	pattern = "tex",
-	callback = function ()
-		-- vim.keymap.set("i", "<tab>", function ()
-		-- 	closing_delim = vim.fn["vimtex#delim#get_next"]("all", "close")
-		-- 	if closing_delim.match ~= nil then
-		-- 		pos = { lnum = closing_delim.lnum, cnum = closing_delim.cnum + #closing_delim.match }
-		-- 		vim.fn["vimtex#pos#set_cursor"](pos)
-		-- 	end
-		-- end)
-	end,
-	desc = "move outside of the containing parentheses",
-})
-
-
-
-
-
--- vim.keymap.set("i", "<tab>", function ()
--- 	ts_utils = require "nvim-treesitter.ts_utils"
--- 	node = ts_utils.get_node_at_cursor()
--- 	ts_utils.goto_node(ts_utils.get_next_node(node, true, true), false)
--- end)
--- vim.keymap.set("i", "<s-tab>", function ()
--- 	ts_utils = require "nvim-treesitter.ts_utils"
--- 	current_node = ts_utils.get_node_at_cursor()
--- 	ts_utils.goto_node(ts_utils.get_previous_node(node, true, true), false)
--- end)
