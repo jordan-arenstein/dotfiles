@@ -1,103 +1,101 @@
+-- use space as the leader key
+local leader = " "
+vim.keymap.set({"n", "v", "o"}, " ", "<nop>") -- disable space to move the cursor
+vim.g.mapleader = leader
+vim.g.maplocalleader = leader
+
 -- # plugins
-local ensure_packer = function()
-	local fn = vim.fn
-	local install_path = fn.stdpath("data").."/site/pack/packer/start/packer.nvim"
-	if fn.empty(fn.glob(install_path)) > 0 then
-		fn.system({"git", "clone", "--depth", "1", "https://github.com/wbthomason/packer.nvim", install_path})
-		vim.cmd.packadd "packer.nvim"
-		return true
-	end
-	return false
+local lazy_path = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not vim.loop.fs_stat(lazy_path) then
+	vim.fn.system({
+		"git",
+		"clone",
+		"--filter=blob:none",
+		"https://github.com/folke/lazy.nvim.git",
+		"--branch=stable", -- latest stable release
+		lazy_path,
+	})
 end
-local packer_bootstrap = ensure_packer()
+vim.opt.rtp:prepend(lazy_path)
 
-require "packer".startup(function (use)
-	use "wbthomason/packer.nvim"
-	use "tpope/vim-repeat"
-	use "tpope/vim-surround"
-	use "tpope/vim-commentary"
-	use "tpope/vim-rsi"
+require "lazy".setup({
+	"folke/lazy.nvim",
+	"tpope/vim-repeat",
+	"tpope/vim-surround",
+	"tpope/vim-commentary",
+	"tpope/vim-rsi",
 
-	use {
+	{
 		"nvim-treesitter/nvim-treesitter",
-		run = function () 
+		build = function () 
 			require "nvim-treesitter.install".update({ with_sync = true }) 
 		end,
-		config = function ()
-			require "nvim-treesitter.configs".setup {
-				ensure_installed = { "lua", "latex" },
-				highlight = {
-					enable = true,
-					-- disable = { "latex" },
-					-- additional_vim_regex_highlighting = { "latex" },
-				},
-				indent = {
-					enable = true,
-				},
-				playground = {
-					enable = true,
-				},
-			}
-		end,
-	}
-	use "nvim-treesitter/playground"
+		opts = {
+			ensure_installed = { "lua", "latex" },
+			highlight = {
+				enable = true,
+				-- disable = { "latex" },
+				-- additional_vim_regex_highlighting = { "latex" },
+			},
+			indent = {
+				enable = true,
+			},
+			playground = {
+				enable = true,
+			},
+		}
+	},
+	"nvim-treesitter/playground",
 
-	use { 
-		"folke/which-key.nvim",
-		config = function ()
-			require "which-key".setup {}
-		end
-	}
+	"folke/which-key.nvim",
 
-	use {
+	{
 		"folke/noice.nvim",
-		config = function ()
-			require "noice".setup {
-				presets = {
-					-- command_palette = false,
-				},
-				messages = {
-					enabled = true,
-					view = "mini",
-					view_error = "notify",
-					view_warn = "mini",
-					view_search = false,
-				},
-				noitfy = {
-					enabled = true,
-					view = "notify",
-				},
+		opts = {
+			presets = {
+				-- command_palette = false,
+			},
+			messages = {
+				enabled = true,
+				view = "mini",
+				view_error = "notify",
+				view_warn = "mini",
+				view_search = false,
+			},
+			noitfy = {
+				enabled = true,
+				view = "notify",
+			},
 
-				views = {
-					cmdline_popup = {
-						border = {
-							style = "none",
-							padding = { 1, 2 },
-						},
-						filter_options = {},
-						win_options = {
-							winhighlight = "NormalFloat:NormalFloat,FloatBorder:FloatBorder",
-						},
+			views = {
+				cmdline_popup = {
+					border = {
+						style = "none",
+						padding = { 1, 2 },
+					},
+					filter_options = {},
+					win_options = {
+						winhighlight = "NormalFloat:NormalFloat,FloatBorder:FloatBorder",
 					},
 				},
-			}
-		end,
-		requires  = {
+			},
+		},
+		dependencies = {
 			"MunifTanjim/nui.nvim",
 			"rcarriga/nvim-notify",
 		}
-	}
+	},
 
-	use {
+	{
 		"L3MON4D3/LuaSnip",
-		config = function () 
-			require("luasnip").config.setup {
-				update_events = "InsertLeave,TextChanged,TextChangedI",
-				delete_check_events = "TextChanged,InsertLeave",
-				enable_autosnippets = true,
-				ext_opts = {},
-			}
+		opts = {
+			update_events = "InsertLeave,TextChanged,TextChangedI",
+			delete_check_events = "TextChanged,InsertLeave",
+			enable_autosnippets = true,
+			ext_opts = {},
+		},
 
+		init = function ()
 			require("luasnip.loaders.from_lua").load("luasnippets")
 			vim.keymap.set({ "i", "s" }, "<tab>", function ()
 				local luasnip = require "luasnip"
@@ -118,54 +116,34 @@ require "packer".startup(function (use)
 				end
 			end)
 			vim.keymap.set("s", "<bs>", "<bs>a") -- deleting in select mode should enter insert mode at the next snippet point
-		end
-	}
-
-	use {
-		"nvim-telescope/telescope.nvim",
-		requires = { "nvim-lua/plenary.nvim" }
-	}
-
-
-	use {
-		"folke/twilight.nvim",
-		config = function()
-			require "twilight".setup {}
-		end
-	}
-	use {
-		"folke/zen-mode.nvim",
-		config = function()
-			require "zen-mode".setup {}
-		end
-	}
-
-	use {
-		"nvim-lualine/lualine.nvim",
-		requires = { "kyazdani42/nvim-web-devicons" },
-		config = function()
-			require "lualine".setup{}
 		end,
-	}
-	use {
+	},
+
+	{
+		"nvim-telescope/telescope.nvim",
+		dependencies = { "nvim-lua/plenary.nvim" }
+	},
+
+
+	"folke/twilight.nvim",
+	"folke/zen-mode.nvim",
+
+	{
+		"nvim-lualine/lualine.nvim",
+		dependencies = { "kyazdani42/nvim-web-devicons" },
+		-- config = function()
+		-- 	require "lualine".setup{}
+		-- end,
+	},
+	{
 		"lervag/vimtex",
-		requires = { "wellle/targets.vim" }
-	}
+		dependencies = { "wellle/targets.vim" }
+	},
 
-	use "altercation/vim-colors-solarized"
-	use "savq/melange"
-	use "folke/tokyonight.nvim"
-
-	if packer_bootstrap then
-		require "packer".sync()
-	end
-end)
-
--- use space as the leader key
-local leader = " "
-vim.keymap.set({"n", "v", "o"}, " ", "<nop>") -- disable space to move the cursor
-vim.g.mapleader = leader
-vim.g.maplocalleader = leader
+	{ "savq/melange", priority = 1000 },
+	"altercation/vim-colors-solarized",
+	"folke/tokyonight.nvim",
+})
 
 -- # system preferences
 vim.opt.backup = false
