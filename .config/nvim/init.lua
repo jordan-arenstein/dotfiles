@@ -25,6 +25,7 @@ require "packer".startup(function (use)
 		end,
 		config = function ()
 			require "nvim-treesitter.configs".setup {
+				ensure_installed = { "lua", "latex" },
 				highlight = {
 					enable = true,
 					-- disable = { "latex" },
@@ -191,6 +192,7 @@ vim.opt.conceallevel = 0
 -- # folds
 vim.opt.foldmethod = "expr"
 vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
+vim.opt.foldlevel = 3
 
 -- # navigation
 vim.keymap.set("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
@@ -209,7 +211,7 @@ vim.keymap.set("n", "<leader>fh", function () require "telescope.builtin".help_t
 
 -- # aesthetics
 vim.opt.termguicolors = true
-vim.cmd.colorscheme "tokyonight"
+vim.cmd.colorscheme "melange"
 vim.opt.background = "dark"
 vim.opt.showtabline = 1
 

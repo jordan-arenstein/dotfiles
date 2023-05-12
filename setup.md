@@ -75,5 +75,6 @@ brew install bettertouchtool
 ## Disable charging chime
 ```
 > defaults write com.apple.PowerChime ChimeOnAllHardware -bool false; killall PowerChime
+> brew install youtube-dl ffmpeg
 ```
 
